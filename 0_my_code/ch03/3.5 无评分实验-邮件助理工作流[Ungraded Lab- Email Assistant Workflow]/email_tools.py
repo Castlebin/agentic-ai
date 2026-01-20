@@ -154,4 +154,7 @@ def search_unread_from_sender(sender: str) -> list:
         List[dict]: A list of unread emails where the sender matches the given address.
     """
     unread = list_unread_emails()
-    return [e for e in unread if e['sender'].lower() == sender.lower()]
+    
+    print("未读：", unread)
+    
+    return [e for e in unread if e['sender'] == sender]

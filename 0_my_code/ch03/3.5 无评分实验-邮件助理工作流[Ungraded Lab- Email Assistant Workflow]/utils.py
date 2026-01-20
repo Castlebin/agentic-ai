@@ -1,15 +1,15 @@
 # ================================
-# Imports
+# 导入
 # ================================
 
-# --- Standard library ---
+# --- 标准库 ---
 import os
 import json
 from html import escape
-from datetime import datetime  # keep if used later
+from datetime import datetime  # 如果稍后使用则保留
 from urllib.parse import urljoin
 
-# --- Third-party ---
+# --- 第三方库 ---
 import requests
 import pandas as pd
 from dotenv import load_dotenv
@@ -18,13 +18,13 @@ from IPython.display import display, HTML
 import base64
 from typing import Any
 
-# --- Local / project ---
-# (add your local imports here, e.g. `import utils`)
+# --- 本地/项目 ---
+# (在此处添加您的本地导入，例如 `import utils`)
 
 # ================================
-# Environment & HTTP session
+# 环境和HTTP会话
 # ================================
-load_dotenv()  # loads .env from the working directory
+load_dotenv()  # 从工作目录加载 .env 文件
 
 BASE_URL = os.getenv("M3_EMAIL_SERVER_API_URL")
 
@@ -33,14 +33,14 @@ session.headers.update({"User-Agent": "LF-ADP-EmailClient/1.0"})
 
 
 # ================================
-# Helpers
+# 辅助函数
 # ================================
 def print_html(content: Any, title: str | None = None, is_image: bool = False):
     """
-    Pretty-print inside a styled card.
-    - If is_image=True and content is a string: treat as image path/URL and render <img>.
-    - If content is a pandas DataFrame/Series: render as an HTML table.
-    - Otherwise (strings/otros): show as code/text in <pre><code>.
+    在带样式的卡片中精美打印。
+    - 如果 is_image=True 且 content 是字符串：视为图片路径/URL并渲染 <img>。
+    - 如果 content 是 pandas DataFrame/Series：渲染为HTML表格。
+    - 否则（字符串/其他）：在 <pre><code> 中显示为代码/文本。
     """
     try:
         from html import escape as _escape
@@ -51,7 +51,7 @@ def print_html(content: Any, title: str | None = None, is_image: bool = False):
         with open(image_path, "rb") as img_file:
             return base64.b64encode(img_file.read()).decode("utf-8")
 
-    # Render content
+    # 渲染内容
     if is_image and isinstance(content, str):
         b64 = image_to_base64(content)
         rendered = f'<img src="data:image/png;base64,{b64}" alt="Image" style="max-width:100%; height:auto; border-radius:8px;">'
@@ -83,7 +83,7 @@ def print_html(content: Any, title: str | None = None, is_image: bool = False):
       font-size:14px;
       color:#111;
     }
-    /* 🔒 Solo afecta lo DENTRO de la tarjeta */
+    /* 🔒 仅影响卡片内部 */
     .pretty-card pre, 
     .pretty-card code {
       background: #f3f4f6;
@@ -117,7 +117,7 @@ def print_html(content: Any, title: str | None = None, is_image: bool = False):
     display(HTML(css + card))
 
 def pretty_display(title: str, response: requests.Response):
-    """Render an HTTP response in a styled block; returns parsed content (JSON if possible)."""
+    """在带样式的块中渲染HTTP响应；如果可能，返回解析后的内容（JSON）。"""
     status = response.status_code
     try:
         content = response.json()
@@ -137,10 +137,10 @@ def pretty_display(title: str, response: requests.Response):
     return content
 
 # ================================
-# API calls
+# API 调用
 # ================================
 def reset_database() -> dict:
-    """Calls the /reset_database endpoint and returns the confirmation message."""
+    """调用 /reset_database 端点并返回确认消息。"""
     r = session.get(f"{BASE_URL}/reset_database")
     r.raise_for_status()
     return r.json()
@@ -198,22 +198,22 @@ def call_llm_email_agent(prompt: str,
                          api_url: str | None = None,
                          timeout: int = 30) -> dict:
     """
-    Calls the M3 LLM server with a natural-language instruction.
+    使用自然语言指令调用 M3 LLM 服务器。
 
-    Args:
-        prompt: Instruction for the agent (e.g., "Check unread emails...").
-        api_url: Base URL of the LLM server. If None, uses env var M3_LLM_SERVER_URL.
-        timeout: HTTP timeout in seconds.
+    参数:
+        prompt: 给代理的指令 (例如, "检查未读邮件...")。
+        api_url: LLM 服务器的基础URL。如果为 None, 则使用环境变量 M3_LLM_SERVER_URL。
+        timeout: HTTP 超时时间（秒）。
 
-    Returns:
-        dict with keys: ok (bool), status (int), response (str|None), raw (dict|str)
+    返回:
+        一个字典，包含键: ok (bool), status (int), response (str|None), raw (dict|str)
     """
-    # Resolve API base URL
+    # 解析 API 基础 URL
     base = api_url or os.getenv("M3_LLM_SERVER_URL")
     if not base:
-        raise RuntimeError("M3_LLM_SERVER_URL is not set. Put it in your .env (e.g., http://127.0.0.1:5001).")
+        raise RuntimeError("M3_LLM_SERVER_URL 未设置。请在 .env 文件中设置 (例如, http://127.0.0.1:5001)。")
 
-    # Build final endpoint; accept both with/without trailing /prompt
+    # 构建最终端点；接受带或不带 /prompt 的结尾
     endpoint = base if base.rstrip("/").endswith("/prompt") else urljoin(base.rstrip("/") + "/", "prompt")
 
     try:
@@ -228,3 +228,5 @@ def call_llm_email_agent(prompt: str,
 
     ok = (r.status_code == 200)
     return {"ok": ok, "status": r.status_code, "response": (data.get("response") if isinstance(data, dict) else None), "raw": data}
+
+
