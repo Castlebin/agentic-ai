@@ -1,1 +1,16 @@
 .vscode/
+
+__pycache__/
+*.pyc
+.DS_Store
+.env
+.ipynb_checkpoints
+.vscode-notebook-cell/
+.venv/
+
+
+
+reminders.txt
+dl_qr_code.png
+
+weather_report.txt

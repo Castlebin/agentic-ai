@@ -9,12 +9,12 @@ def pretty_print_chat_completion(response):
             return str(data)
 
     steps_html = ""
-    tool_sequence = []  # ← Track tool names
+    tool_sequence = []  # ← 跟踪工具名称
     choice = response.choices[0]
     intermediate_messages = getattr(choice, "intermediate_messages", [])
 
     for step in intermediate_messages:
-        # Step: LLM decision to call a tool
+        # 步骤：LLM 决定调用工具
         if hasattr(step, "tool_calls") and step.tool_calls:
             for call in step.tool_calls:
                 tool_name = call.function.name
@@ -26,7 +26,7 @@ def pretty_print_chat_completion(response):
                     <pre style="color:#000; font-size:13px;">{format_json(args)}</pre>
                 </div>
                 """
-        # Step: tool response
+        # 步骤：工具响应
         elif isinstance(step, dict) and step.get("role") == "tool":
             tool_name = step.get("name")
             tool_output = step.get("content")
@@ -41,7 +41,7 @@ def pretty_print_chat_completion(response):
             </div>
             """
 
-    # Final assistant message
+    # 最终助手消息
     final_msg = choice.message.content
     steps_html += f"""
     <div style="border-left: 4px solid #28a745; margin: 20px 0; padding: 10px; background: #eafbe7;">
@@ -50,7 +50,7 @@ def pretty_print_chat_completion(response):
     </div>
     """
 
-    # Tool sequence summary
+    # 工具序列摘要
     if tool_sequence:
         arrow_sequence = " → ".join(tool_sequence)
         steps_html += f"""
@@ -120,4 +120,5 @@ def pretty_print_chat_completion_html(response):
         </div>
         """
 
-    return steps_html  # ✅ RETURN HTML as string
+    return steps_html  # ✅ 返回 HTML 字符串
+
